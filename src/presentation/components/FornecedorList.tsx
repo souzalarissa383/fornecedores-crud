@@ -44,7 +44,7 @@ const Button = styled.button`
   cursor: pointer;
   font-size: 14px;
   &:hover {
-    background-color: #4AC0FF; /* Azul claro para hover */
+    background-color: #4ac0ff; /* Azul claro para hover */
   }
 
   @media (max-width: 768px) {
@@ -56,7 +56,7 @@ const Button = styled.button`
 const WhatsAppButton = styled(Button)`
   background-color: #25d366; /* Verde do WhatsApp */
   &:hover {
-    background-color: #128C7E; /* Verde mais escuro para hover */
+    background-color: #128c7e; /* Verde mais escuro para hover */
   }
 `;
 
@@ -101,7 +101,7 @@ interface FornecedorListProps {
   onEdit: (fornecedor: Fornecedor) => void;
 }
 
-export const FornecedorList: React.FC<FornecedorListProps> = ({ fornecedores, onDelete, onEdit }) => {
+const FornecedorList: React.FC<FornecedorListProps> = ({ fornecedores, onDelete, onEdit }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredFornecedores = fornecedores.filter((fornecedor) =>
@@ -109,39 +109,36 @@ export const FornecedorList: React.FC<FornecedorListProps> = ({ fornecedores, on
   );
 
   const handleWhatsAppClick = (telefone: string) => {
-    const url = `https://wa.me/${telefone.replace(/\D/g, '')}`;
-    window.open(url, '_blank');
+    const url = `https://wa.me/${telefone.replace(/\D/g, "")}`;
+    window.open(url, "_blank");
   };
 
   const handleExportCSV = () => {
     const headers = ["Nome", "Descrição", "Telefone", "CEP", "Estado", "Cidade", "Logradouro", "Número", "Referência"];
-    const rows = fornecedores.map(fornecedor => [
+    const rows = fornecedores.map((fornecedor) => [
       fornecedor.nome,
-      fornecedor.descricao || '',
-      fornecedor.contatos[0].telefone,
+      fornecedor.descricao || "",
+      fornecedor.contatos.length > 0 ? fornecedor.contatos[0].telefone : "",
       fornecedor.endereco.cep,
       fornecedor.endereco.estado,
       fornecedor.endereco.cidade,
       fornecedor.endereco.logradouro,
       fornecedor.endereco.numero,
-      fornecedor.endereco.referencia || ''
+      fornecedor.endereco.referencia || "",
     ]);
 
-    const csvContent = [
-      headers.join(','),
-      ...rows.map(row => row.join(','))
-    ].join('\n');
+    const csvContent = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = 'fornecedores.csv';
+    link.download = "fornecedores.csv";
     link.click();
   };
 
   const handleMapsClick = (endereco: string) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`;
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   };
 
   return (
@@ -168,8 +165,8 @@ export const FornecedorList: React.FC<FornecedorListProps> = ({ fornecedores, on
               <Td>{fornecedor.descricao}</Td>
               <Td>
                 <Button onClick={() => onEdit(fornecedor)}>Editar</Button>
-                <Button onClick={() => onDelete(fornecedor.id!)}>Excluir</Button>
-                <WhatsAppButton onClick={() => handleWhatsAppClick(fornecedor.contatos[0].telefone)}>
+                <Button onClick={() => fornecedor.id && onDelete(fornecedor.id)}>Excluir</Button>
+                <WhatsAppButton onClick={() => fornecedor.contatos.length > 0 && handleWhatsAppClick(fornecedor.contatos[0].telefone)}>
                   WhatsApp
                 </WhatsAppButton>
                 <MapsButton onClick={() => handleMapsClick(`${fornecedor.endereco.logradouro}, ${fornecedor.endereco.numero}, ${fornecedor.endereco.cidade}, ${fornecedor.endereco.estado}`)}>
@@ -183,3 +180,5 @@ export const FornecedorList: React.FC<FornecedorListProps> = ({ fornecedores, on
     </div>
   );
 };
+
+export default FornecedorList;

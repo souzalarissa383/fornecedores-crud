@@ -8,7 +8,7 @@ import { Fornecedor } from "../../core/entities/Fornecedor";
 
 const Container = styled.div`
   padding: 20px;
-  background-color: #ffffff; /* Fundo branco */
+  background-color: #ffffff; 
 
   @media (max-width: 768px) {
     padding: 10px;
@@ -18,7 +18,7 @@ const Container = styled.div`
 const Title = styled.h1`
   font-size: 24px;
   margin-bottom: 20px;
-  color: #003875; /* Azul escuro para títulos */
+  color: #003875;
 `;
 
 const CadastroFornecedor: React.FC = () => {

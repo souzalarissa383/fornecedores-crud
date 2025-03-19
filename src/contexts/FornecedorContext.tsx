@@ -8,7 +8,7 @@ interface FornecedorContextType {
   excluirFornecedor: (id: string) => Promise<void>;
   editarFornecedor: (fornecedor: Fornecedor) => Promise<void>;
   atualizarFornecedores: () => Promise<void>;
-  buscarFornecedorPorId: (id: string) => Promise<Fornecedor | null>;
+  buscarFornecedorPorId: (id: string) => Promise<Fornecedor | null>; // Adicione esta linha
 }
 
 const FornecedorContext = createContext<FornecedorContextType | undefined>(undefined);
@@ -29,69 +29,54 @@ export const FornecedorProvider: React.FC<FornecedorProviderProps> = ({ children
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const fornecedorRepository = new FornecedorRepositoryImpl();
 
-  const adicionarFornecedor = async (fornecedor: Fornecedor) => {
+  const adicionarFornecedor = async (novoFornecedor: Fornecedor) => {
     try {
-      const novoFornecedor = await fornecedorRepository.criar(fornecedor);
-      setFornecedores((prev) => [...prev, novoFornecedor]); 
-      console.log("Fornecedor adicionado:", novoFornecedor); 
+      const fornecedorCriado = await fornecedorRepository.criar(novoFornecedor);
+      setFornecedores((prevFornecedores) => [...prevFornecedores, fornecedorCriado]);
     } catch (error) {
-      console.error("Erro ao adicionar fornecedor:", error); 
-      throw error; 
+      console.error("Erro ao criar fornecedor", error);
     }
   };
 
   const excluirFornecedor = async (id: string) => {
     try {
       await fornecedorRepository.excluir(id);
-      setFornecedores((prev) => prev.filter((f) => f.id !== id)); 
-      console.log("Fornecedor excluído:", id);
+      setFornecedores((prev) => prev.filter((f) => f.id !== id));
     } catch (error) {
-      console.error("Erro ao excluir fornecedor:", error); 
-      throw error; 
+      console.error("Erro ao excluir fornecedor:", error);
+      throw error;
     }
   };
 
-  const editarFornecedor = async (fornecedor: Fornecedor) => {
+  const editarFornecedor = async (fornecedorEditado: Fornecedor) => {
     try {
-      
-      const fornecedorExistente = fornecedores.find((f) => f.id === fornecedor.id);
-      if (!fornecedorExistente) {
-        throw new Error("Fornecedor não encontrado no estado local");
-      }
-
-      
-      const fornecedorAtualizado = await fornecedorRepository.editar(fornecedor);
-
-      
-      setFornecedores((prev) =>
-        prev.map((f) => (f.id === fornecedorAtualizado.id ? fornecedorAtualizado : f))
+      const fornecedorAtualizado = await fornecedorRepository.editar(fornecedorEditado);
+      setFornecedores((prevFornecedores) =>
+        prevFornecedores.map((f) => (f.id === fornecedorAtualizado.id ? fornecedorAtualizado : f))
       );
-
-      console.log("Fornecedor editado no estado:", fornecedorAtualizado); 
     } catch (error) {
-      console.error("Erro ao editar fornecedor:", error); 
-      throw error; 
+      console.error("Erro ao editar fornecedor:", error);
+      throw error;
     }
   };
 
   const atualizarFornecedores = async () => {
     try {
       const listaAtualizada = await fornecedorRepository.listar();
-      setFornecedores(listaAtualizada); 
-      console.log("Lista de fornecedores atualizada:", listaAtualizada); 
+      setFornecedores(listaAtualizada);
     } catch (error) {
-      console.error("Erro ao atualizar fornecedores:", error); 
-      throw error; 
+      console.error("Erro ao atualizar fornecedores:", error);
+      throw error;
     }
   };
 
   const buscarFornecedorPorId = async (id: string) => {
     try {
       const fornecedor = await fornecedorRepository.buscarPorId(id);
-      return fornecedor; 
+      return fornecedor;
     } catch (error) {
-      console.error("Erro ao buscar fornecedor por ID:", error); 
-      throw error; 
+      console.error("Erro ao buscar fornecedor por ID:", error);
+      throw error;
     }
   };
 
@@ -103,7 +88,7 @@ export const FornecedorProvider: React.FC<FornecedorProviderProps> = ({ children
         excluirFornecedor,
         editarFornecedor,
         atualizarFornecedores,
-        buscarFornecedorPorId,
+        buscarFornecedorPorId, 
       }}
     >
       {children}

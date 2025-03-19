@@ -13,7 +13,7 @@ const schema = yup.object().shape({
       yup.object().shape({
         telefone: yup
           .string()
-          .matches(/^\(\d{2}\) \d{4,5}\d{4}$/, "Telefone inválido")
+          .matches(/^\(\d{2}\)\d{4,5}\d{4}$/, "Telefone inválido")
           .required("Telefone do contato é obrigatório"),
       })
     )

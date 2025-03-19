@@ -2,36 +2,33 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Fornecedor } from "../../core/entities/Fornecedor";
 import { useFornecedorContext } from "../../contexts/FornecedorContext";
-import { FornecedorList } from "../components/FornecedorList";
 import { FornecedorForm } from "../components/FornecedorForm";
 import { Notification } from "../components/Notification";
+import FornecedorList from "../components/FornecedorList";
+import { Modal } from "../components/Modal";
 
 const Container = styled.div`
   padding: 20px;
-  background-color: #ffffff; /* Fundo branco */
-
-  @media (max-width: 768px) {
-    padding: 10px;
-  }
+  background-color: #ffffff;
 `;
 
 const Title = styled.h1`
   font-size: 24px;
   margin-bottom: 20px;
-  color: #003875; /* Azul escuro para títulos */
+  color: #003875;
 `;
 
 const Button = styled.button`
   padding: 10px;
-  background-color: #3fa1ff; /* Azul médio para botões */
-  color: #ffffff; /* Texto branco */
+  background-color: #3fa1ff;
+  color: #ffffff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
   margin-bottom: 20px;
   &:hover {
-    background-color: #4AC0FF; /* Azul claro para hover */
+    background-color: #4ac0ff;
   }
 `;
 
@@ -62,14 +59,18 @@ const ListarFornecedoresPage: React.FC = () => {
   const handleCadastrar = async (data: Partial<Fornecedor>) => {
     try {
       if (fornecedorParaEditar) {
+
         await editarFornecedor({ ...fornecedorParaEditar, ...data } as Fornecedor);
+        setNotification({ message: "Fornecedor editado com sucesso!", type: "success" });
       } else {
-        await adicionarFornecedor(data as Fornecedor);
+
+        const novoFornecedor: Fornecedor = { ...data, id: crypto.randomUUID() } as Fornecedor;
+        await adicionarFornecedor(novoFornecedor);
+        setNotification({ message: "Fornecedor salvo com sucesso!", type: "success" });
       }
-      await atualizarFornecedores();
+
       setIsCadastro(false);
       setFornecedorParaEditar(null);
-      setNotification({ message: "Fornecedor salvo com sucesso!", type: "success" });
     } catch (error) {
       setNotification({ message: "Erro ao salvar fornecedor", type: "error" });
     }
@@ -93,18 +94,28 @@ const ListarFornecedoresPage: React.FC = () => {
   return (
     <Container>
       <Title>Lista de Fornecedores</Title>
-      {notification && <Notification message={notification.message} type={notification.type} />}
-      <Button onClick={() => setIsCadastro(true)}>Cadastrar Novo Fornecedor</Button>
+      {notification && <Notification message={notification.message} type={notification.type} isVisible={false} />}
+
+      <Button onClick={() => {
+        setFornecedorParaEditar(null);
+        setIsCadastro(true);
+      }}>
+        Cadastrar Novo Fornecedor
+      </Button>
+
       {isCadastro && (
-        <FornecedorForm
-          onSubmit={handleCadastrar}
-          onCancel={() => {
-            setIsCadastro(false);
-            setFornecedorParaEditar(null);
-          }}
-          defaultValues={fornecedorParaEditar || undefined}
-        />
+        <Modal isOpen={isCadastro} onClose={() => setIsCadastro(false)}>
+          <FornecedorForm
+            onSubmit={handleCadastrar}
+            onCancel={() => {
+              setIsCadastro(false);
+              setFornecedorParaEditar(null);
+            }}
+            defaultValues={fornecedorParaEditar || undefined}
+          />
+        </Modal>
       )}
+
       <FornecedorList
         fornecedores={fornecedores}
         onDelete={handleExcluir}
